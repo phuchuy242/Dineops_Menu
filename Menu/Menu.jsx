@@ -4,7 +4,7 @@ import { useNavigate, useLocation, useNavigationType } from 'react-router-dom';
 import Header from './Header';
 import MenuCard from './Menucard';
 import CartSummary from './CartSummary';
-import { API_BASE } from '../config';
+import { API_BASE, apiFetch } from '../config';
 import Cart from '../lib/cart';
 import '../styles/menu.scss';
 import CartTablet from './CartTablet';
@@ -51,9 +51,9 @@ export default function Menu({
             try {
                 setLoading(true);
                 const [catRes, prodRes, varRes] = await Promise.all([
-                    fetch(`${API_BASE}/api/v1/menu/categories/?page=1&page_size=100`),
-                    fetch(`${API_BASE}/api/v1/menu/products/?page=1&page_size=100`),
-                    fetch(`${API_BASE}/api/v1/menu/variants/?page=1&page_size=1000`),
+                    apiFetch(`${API_BASE}/api/v1/menu/categories/?page=1&per_page=100`),
+                    apiFetch(`${API_BASE}/api/v1/menu/products/?page=1&per_page=100`),
+                    apiFetch(`${API_BASE}/api/v1/menu/variants/?page=1&per_page=1000`),
                 ]);
                 const catJson = await catRes.json();
                 const prodJson = await prodRes.json();

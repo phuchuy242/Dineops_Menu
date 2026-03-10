@@ -17,7 +17,6 @@ export default function FeedbackCard({ orderId = '8829-21', onSubmit, onClose })
     const [selectedTags, setSelectedTags] = useState([]);
     const [comment, setComment] = useState('');
 
-    // --- LOGIC MỚI: Xử lý chọn nửa sao ---
     const handleRatingMove = (e, starIndex) => {
         const { left, width } = e.currentTarget.getBoundingClientRect();
         const clickX = e.clientX - left;
@@ -28,12 +27,14 @@ export default function FeedbackCard({ orderId = '8829-21', onSubmit, onClose })
         setHoverRating(value);
     };
 
-    const handleRatingClick = () => {
-        if (hoverRating !== 0) {
-            setRating(hoverRating);
-        }
+    const handleRatingClick = (e, starIndex) => {
+        const { left, width } = e.currentTarget.getBoundingClientRect();
+        const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? e.changedTouches?.[0]?.clientX ?? (left + width);
+        const isHalf = (clientX - left) < width / 2;
+        const value = isHalf ? starIndex - 0.5 : starIndex;
+        setRating(value);
+        setHoverRating(0);
     };
-    // -------------------------------------
 
     const toggleTag = (tagId) => {
         setSelectedTags((prev) => {
@@ -95,7 +96,7 @@ export default function FeedbackCard({ orderId = '8829-21', onSubmit, onClose })
                             <button
                                 key={star}
                                 className="rm-star-btn"
-                                onClick={handleRatingClick}
+                                onClick={(e) => handleRatingClick(e, star)}
                                 onMouseMove={(e) => handleRatingMove(e, star)}
                                 onMouseLeave={() => setHoverRating(0)}
                                 type="button"

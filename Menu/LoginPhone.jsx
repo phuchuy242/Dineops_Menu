@@ -112,7 +112,7 @@ export default function LoginOtp({ isOpen = true, onClose = () => { } }) {
                         <button
                             className="rm-auth-btn-primary"
                             onClick={handleVerify}
-                            disabled={!otp}
+                            disabled={otp.length < 6}
                         >
                             {t('login.verify')}
                         </button>

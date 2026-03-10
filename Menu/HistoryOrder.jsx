@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import '../styles/history-order.scss';
-import { API_BASE } from '../config';
+import { API_BASE, apiFetch } from '../config';
 import Payment from './Payment';
 import {
     ArrowLeft,
@@ -43,8 +43,8 @@ const HistoryOrder = () => {
         setError('');
         try {
             const [orderRes, productsRes] = await Promise.all([
-                fetch(`${API_BASE}/api/v1/orders/by-paycode/?pay_code=${encodeURIComponent(paycode)}`),
-                fetch(`${API_BASE}/api/v1/menu/products/?page=1&page_size=200`),
+                apiFetch(`${API_BASE}/api/v1/orders/by-paycode/?pay_code=${encodeURIComponent(paycode)}`),
+                apiFetch(`${API_BASE}/api/v1/menu/products/?page=1&per_page=200`),
             ]);
             const orderJson = await orderRes.json();
             if (!orderRes.ok || !orderJson.status) throw new Error(orderJson?.msg || 'Fetch failed');

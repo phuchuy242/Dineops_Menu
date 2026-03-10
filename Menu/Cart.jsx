@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import "../styles/cart.scss";
-import { API_BASE } from '../config';
+import { API_BASE, apiFetch } from '../config';
+import backIcon from '../public/images/back.png';
 import {
     ArrowLeft,
     ChevronDown,
@@ -198,7 +199,8 @@ export default function Cart({ setCartCount, setCartTotal }) {
                                 disabled={submitting || cart.length === 0}
                                 onClick={async () => {
                                     if (submitting || cart.length === 0) return;
-                                    const tableId = localStorage.getItem('table_code') || localStorage.getItem('tableId') || '1';
+                                    const rawTable = localStorage.getItem('table_code') || localStorage.getItem('tableId') || '';
+                                    const tableId = parseInt(rawTable, 10) || parseInt(rawTable.replace(/\D/g, ''), 10) || 1;
 
                                     const items = cart.map((item) => ({
                                         variant: item.variant_id ?? item.id,
@@ -207,13 +209,13 @@ export default function Cart({ setCartCount, setCartTotal }) {
                                     }));
 
                                     const payload = {
-                                        table: Number(tableId),
+                                        table: tableId,
                                         items,
                                     };
 
                                     try {
                                         setSubmitting(true);
-                                        const res = await fetch(`${API_BASE}/api/v1/orders/`, {
+                                        const res = await apiFetch(`${API_BASE}/api/v1/orders/`, {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify(payload),
@@ -256,7 +258,7 @@ export default function Cart({ setCartCount, setCartTotal }) {
                             </button>
 
                             <button onClick={() => navigate(-1)} className="w-full border border-slate-300 dark:border-slate-700 font-medium py-3 px-5 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex justify-center items-center gap-2">
-                                <img src="/images/back.png" alt="Back" className="rm-back-icon" />
+                                <img src={backIcon} alt="Back" className="rm-back-icon" />
                                 <span>{t('cart.backHome')}</span>
                             </button>
                             <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">

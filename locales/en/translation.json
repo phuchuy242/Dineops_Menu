@@ -62,7 +62,9 @@
         "notePlaceholder": "E.g., More ice, change dish...",
         "cancel": "Cancel",
         "submit": "Submit",
-        "selectOption": "Please select an option"
+        "selectOption": "Please select an option",
+        "sending": "Sending…",
+        "sent": "Sent!"
     },
     "payment": {
         "title": "Payment",

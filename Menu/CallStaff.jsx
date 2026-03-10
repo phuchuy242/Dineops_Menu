@@ -2,31 +2,72 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoWaterOutline, IoRestaurantOutline, IoBookOutline } from 'react-icons/io5';
 import { GiBroom } from 'react-icons/gi';
+import { FiMoreHorizontal, FiCheck } from 'react-icons/fi';
 import '../styles/call-staff.scss';
+import { API_BASE, apiFetch } from '../config';
+
+// Map option id → call_type của API
+const CALL_TYPE_MAP = {
+    water: 'water',
+    cutlery: 'utensils',
+    clean: 'clean_table',
+    menu: 'consultation',
+    others: 'other',
+};
 
 export default function CallStaff({ open = true, onClose = () => { }, onSubmit = (data) => { } }) {
     const { t } = useTranslation();
     const [selectedOption, setSelectedOption] = useState('');
     const [note, setNote] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState('');
 
     const quickOptions = [
         { id: 'water', icon: <IoWaterOutline />, label: t('callstaff.addWater') },
         { id: 'cutlery', icon: <IoRestaurantOutline />, label: t('callstaff.addCutlery') },
-        { id: 'others', icon: '...', label: t('callstaff.others') },
         { id: 'clean', icon: <GiBroom />, label: t('callstaff.cleanTable') },
         { id: 'menu', icon: <IoBookOutline />, label: t('callstaff.menuAdvice') },
+        { id: 'others', icon: <FiMoreHorizontal />, label: t('callstaff.others') },
     ];
 
     if (!open) return null;
 
-    const handleSubmit = () => {
-        const requestData = {
-            category: selectedOption || t('callstaff.other'),
-            note: note.trim()
+    const handleSubmit = async () => {
+        if (!selectedOption) return;
+        const tableId = Number(localStorage.getItem('table_code') || localStorage.getItem('tableId') || '1');
+        const call_type = CALL_TYPE_MAP[selectedOption] || 'other';
+
+        const payload = {
+            table: tableId,
+            call_type,
+            notes: note.trim(),
         };
-        onSubmit(requestData);
-        setSelectedOption('');
-        setNote('');
+
+        try {
+            setLoading(true);
+            setError('');
+            const res = await apiFetch(`${API_BASE}/api/v1/staff-calls/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json?.message || json?.msg || 'Gọi nhân viên thất bại');
+
+            setSuccess(true);
+            onSubmit(json?.data || payload);
+            setTimeout(() => {
+                setSuccess(false);
+                setSelectedOption('');
+                setNote('');
+                onClose();
+            }, 1500);
+        } catch (e) {
+            setError(e.message || 'Không thể gọi nhân viên. Vui lòng thử lại.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -39,13 +80,12 @@ export default function CallStaff({ open = true, onClose = () => { }, onSubmit =
                     <p className="rm-cs-subtitle">{t('callstaff.selectOption')}</p>
                 </div>
 
-                {/* Grid chọn nhanh */}
                 <div className="rm-cs-grid">
                     {quickOptions.map((option) => (
                         <div
                             key={option.id}
-                            className={`rm-cs-option ${selectedOption === option.label ? 'active' : ''}`}
-                            onClick={() => setSelectedOption(option.label)}
+                            className={`rm-cs-option ${selectedOption === option.id ? 'active' : ''}`}
+                            onClick={() => setSelectedOption(option.id)}
                         >
                             <span className="rm-cs-icon">{option.icon}</span>
                             <span className="rm-cs-label">{option.label}</span>
@@ -53,7 +93,6 @@ export default function CallStaff({ open = true, onClose = () => { }, onSubmit =
                     ))}
                 </div>
 
-                {/* Ô nhập ghi chú */}
                 <div className="rm-cs-input-group">
                     <label className="rm-cs-label-text">{t('callstaff.note')}:</label>
                     <textarea
@@ -65,13 +104,22 @@ export default function CallStaff({ open = true, onClose = () => { }, onSubmit =
                     />
                 </div>
 
+                {error && <p style={{ color: '#e53e3e', fontSize: 13, margin: '0 0 8px', textAlign: 'center' }}>{error}</p>}
+
                 <div className="rm-cs-actions">
-                    <button className="rm-cs-btn rm-cs-btn-close" onClick={onClose}>{t('callstaff.cancel')}</button>
+                    <button className="rm-cs-btn rm-cs-btn-close" onClick={onClose} disabled={loading}>
+                        {t('callstaff.cancel')}
+                    </button>
                     <button
                         className="rm-cs-btn rm-cs-btn-call"
                         onClick={handleSubmit}
+                        disabled={loading || !selectedOption || success}
                     >
-                        {t('callstaff.title')}
+                        {success
+                            ? <><FiCheck style={{ marginRight: 4 }} />{t('callstaff.sent') || 'Đã gửi!'}</>
+                            : loading
+                                ? (t('callstaff.sending') || 'Đang gửi…')
+                                : t('callstaff.title')}
                     </button>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaMoneyBillWave, FaUniversity } from 'react-icons/fa';
-import { API_BASE } from '../config';
+import { API_BASE, apiFetch } from '../config';
 import '../styles/payment.scss';
 
 export default function Payment({
@@ -32,7 +32,7 @@ export default function Payment({
 
         pollRef.current = setInterval(async () => {
             try {
-                const res = await fetch(`${API_BASE}/api/v1/payments/by_pay_code/?pay_code=${encodeURIComponent(pay_code)}`);
+                const res = await apiFetch(`${API_BASE}/api/v1/payments/by_pay_code/?pay_code=${encodeURIComponent(pay_code)}`);
                 if (!res.ok) return;
                 const json = await res.json();
                 const status = json?.payment_status || json?.data?.payment_status || '';
@@ -63,13 +63,29 @@ export default function Payment({
             setSubmitting(true);
             setQrError('');
             try {
-                const res = await fetch(`${API_BASE}/api/v1/payments/create_with_qr/`, {
+                const res = await apiFetch(`${API_BASE}/api/v1/payments/create_with_qr/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pay_code, payment_method: 'bank_transfer' }),
                 });
                 const json = await res.json();
-                if (!res.ok) throw new Error(json?.msg || json?.detail || 'Tạo QR thất bại');
+
+                // Nếu payment đã tồn tại, GET lại thông tin QR cũ
+                if (!res.ok) {
+                    const alreadyExists = json?.errors?.pay_code?.some?.((m) =>
+                        String(m).toLowerCase().includes('already exists')
+                    );
+                    if (alreadyExists) {
+                        const getRes = await apiFetch(`${API_BASE}/api/v1/payments/by_pay_code/?pay_code=${encodeURIComponent(pay_code)}`);
+                        const getData = await getRes.json();
+                        if (!getRes.ok) throw new Error(getData?.msg || 'Không thể lấy thông tin thanh toán.');
+                        const data = getData.data ?? getData;
+                        setQrData(data);
+                        return;
+                    }
+                    throw new Error(json?.msg || json?.detail || 'Tạo QR thất bại');
+                }
+
                 const data = json.data ?? json;
                 setQrData(data);
             } catch (e) {
@@ -87,7 +103,7 @@ export default function Payment({
         if (!pay_code) { setQrData(null); return; }
         setCancelling(true);
         try {
-            await fetch(`${API_BASE}/api/v1/payments/cancel-by-paycode/`, {
+            await apiFetch(`${API_BASE}/api/v1/payments/cancel-by-paycode/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ pay_code }),

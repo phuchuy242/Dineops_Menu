@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import Header from "./Header";
 import "../styles/giohang.css";
+import backIcon from '../public/images/back.png';
 
 
 function formatPrice(n) {
@@ -113,7 +114,7 @@ export default function Giohang() {
                             </button>
 
                             <button onClick={() => navigate('/menu')} className="w-full border border-slate-300 dark:border-slate-700 font-medium py-4 px-6 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex justify-center items-center gap-2">
-                                <img src="/images/back.png" alt="Back" className="back-icon" />
+                                <img src={backIcon} alt="Back" className="back-icon" />
                                 <span>Quay lại trang chủ</span>
                             </button>
                             <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-4">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import "../styles/detail.scss";
-import { API_BASE } from '../config';
+import { API_BASE, apiFetch } from '../config';
 import { X } from "feather-icons-react";
 
 function formatVND(amount) {
@@ -46,7 +46,7 @@ export default function DetailProducts({
         if (!idToUse) return;
         let cancelled = false;
         setLoading(true);
-        fetch(`${API_BASE}/api/v1/menu/products/${idToUse}/`)
+        apiFetch(`${API_BASE}/api/v1/menu/products/${idToUse}/`)
             .then((r) => r.json())
             .then((json) => {
                 if (cancelled) return;
@@ -61,7 +61,7 @@ export default function DetailProducts({
     useEffect(() => {
         if (!idToUse) return;
         let cancelled = false;
-        fetch(`${API_BASE}/api/v1/menu/variants/?page=1&page_size=100`)
+        apiFetch(`${API_BASE}/api/v1/menu/variants/?page=1&per_page=100`)
             .then((r) => r.json())
             .then((json) => {
                 if (cancelled) return;

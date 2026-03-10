@@ -62,7 +62,9 @@
         "notePlaceholder": "Ví dụ: Xin thêm đá, đổi món...",
         "cancel": "Hủy",
         "submit": "Gửi",
-        "selectOption": "Vui lòng chọn một tùy chọn"
+        "selectOption": "Vui lòng chọn một tùy chọn",
+        "sending": "Đang gửi…",
+        "sent": "Đã gửi!"
     },
     "payment": {
         "title": "Thanh toán",

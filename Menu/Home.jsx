@@ -9,8 +9,7 @@ import CallStaff from './CallStaff';
 import LoginOtp from './LoginPhone';
 import FeedbackCard from './Feedbackcard';
 import LanguageSwitcher from './LanguageSwitcher';
-
-const HERO = '/images/home.png';
+import HERO from '../public/images/home.png';
 export default function Home() {
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -22,6 +21,46 @@ export default function Home() {
     const [editing, setEditing] = useState(false);
     const [tempName, setTempName] = useState(name);
     const inputRef = useRef(null);
+
+    const [tableCode, setTableCode] = useState(() => localStorage.getItem('table_code') || localStorage.getItem('tableId') || '');
+    const [tables, setTables] = useState([]);
+    const [showTableSelect, setShowTableSelect] = useState(false);
+
+    // Đóng dropdown khi click ra ngoài
+    useEffect(() => {
+        if (!showTableSelect) return;
+        const handler = (e) => {
+            if (!e.target.closest('.rm-hf-table')) setShowTableSelect(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [showTableSelect]);
+
+    // Load danh sách bàn từ API khi mở trang
+    useEffect(() => {
+        import('../config').then(({ API_BASE, apiFetch }) => {
+            apiFetch(`${API_BASE}/api/v1/tables/?per_page=100`)
+                .then((r) => r.json())
+                .then((json) => {
+                    const list = json?.data?.results || json?.data || json?.results || [];
+                    if (Array.isArray(list) && list.length > 0)
+                        setTables(list.filter((t) => t.status === 'available'));
+                })
+                .catch(() => { });
+        });
+    }, []);
+
+    const selectTable = (tbl) => {
+        const id = String(tbl.id);
+        const display = tbl.table_number || tbl.name || id;
+        setTableCode(display);
+        try {
+            localStorage.setItem('table_code', id);
+            localStorage.setItem('tableId', id);
+            localStorage.setItem('table_display', display);
+        } catch (e) { }
+        setShowTableSelect(false);
+    };
 
     useEffect(() => {
         if (editing) {
@@ -83,9 +122,34 @@ export default function Home() {
                         )}
                         <button className="rm-hf-edit" onClick={() => setEditing(true)}><IoPencilOutline /></button>
                     </div>
-                    <div className="rm-hf-table">
+                    <div className="rm-hf-table" style={{ position: 'relative' }}>
                         <p className="rm-hf-table-text">{t('home.subtitle')}</p>
-                        <span className="rm-hf-table-pill">T02</span>
+                        <span
+                            className="rm-hf-table-pill"
+                            onClick={() => setShowTableSelect((v) => !v)}
+                            title="Bấm để đổi bàn"
+                        >
+                            {tableCode || '---'}
+                            <IoPencilOutline style={{ marginLeft: 4, fontSize: 12, opacity: 0.7 }} />
+                        </span>
+                        {showTableSelect && (
+                            <div className="rm-hf-table-dropdown">
+                                {tables.length === 0 ? (
+                                    <div className="rm-hf-table-dropdown-empty">Đang tải...</div>
+                                ) : (
+                                    tables.map((tbl) => (
+                                        <div
+                                            key={tbl.id}
+                                            className={`rm-hf-table-dropdown-item ${String(tbl.id) === localStorage.getItem('table_code') ? 'active' : ''}`}
+                                            onClick={() => selectTable(tbl)}
+                                        >
+                                            {tbl.table_number || tbl.name || `Bàn ${tbl.id}`}
+                                            {tbl.status && <span className="rm-hf-table-status">{tbl.status}</span>}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
