@@ -1,0 +1,173 @@
+/* FeedbackCard styles */
+.rm-feedback-container {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 8500;
+}
+
+.rm-feedback-card {
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 520px;
+    padding: 20px 20px 40px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.rm-feedback-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: transparent;
+    border: 0;
+    font-size: 22px;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.rm-card-header1 {
+    margin-bottom: 16px;
+}
+
+.rm-card-header1.row2 h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.rm-card-header1.row2 p {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* Star rating */
+.rm-rating-section {
+    margin-bottom: 20px;
+}
+
+.rm-section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.rm-stars-container {
+    display: flex;
+    gap: 4px;
+}
+
+.rm-star-btn {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    display: inline-flex;
+    cursor: pointer;
+}
+
+.rm-star-icon {
+    display: block;
+}
+
+/* Tags */
+.rm-tags-section {
+    margin-bottom: 20px;
+}
+
+.rm-tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rm-tag-chip {
+    padding: 7px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.rm-tag-chip.selected {
+    background: #fff7f0;
+    border-color: #ff7a18;
+    color: #ff7a18;
+    font-weight: 600;
+}
+
+/* Comment */
+.rm-comment-section {
+    margin-bottom: 20px;
+}
+
+.rm-comment-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+}
+
+.rm-comment-input:focus {
+    border-color: #ff7a18;
+}
+
+/* Footer buttons */
+.rm-card-footer {
+    display: flex;
+    gap: 12px;
+}
+
+.rm-btn-skip {
+    flex: 1;
+    padding: 13px;
+    background: #f1f5f9;
+    border: 0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.rm-btn-skip:hover {
+    background: #e2e8f0;
+}
+
+.rm-btn-submit {
+    flex: 2;
+    padding: 13px 20px;
+    background: #12b886;
+    border: 0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.rm-btn-submit:hover {
+    background: #0ca678;
+}
+
+.rm-btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
